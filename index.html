@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>ПРАВОПИСНА БИТКА</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Share+Tech+Mono&display=swap');
+
+        :root { --blue: #1e3c72; --red: #ff5252; --green: #2ecc71; --dark: #455a64; --gold: #f1c40f; }
+        body { margin: 0; font-family: 'Montserrat', sans-serif; background: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        
+        .screen { width: 98vw; height: 96vh; background: #f0f0f0; border-radius: 25px; display: flex; flex-direction: column; border: 8px solid #333; position: relative; }
+        .header { height: 70px; background: var(--blue); display: flex; align-items: center; justify-content: center; border-radius: 15px 15px 0 0; }
+        .header h1 { color: white; font-size: 2.5em; margin: 0; text-transform: uppercase; }
+        #timer-box { position: absolute; right: 30px; background: #000; color: #00ff00; padding: 5px 20px; border-radius: 10px; font-family: 'Share+Tech+Mono', monospace; font-size: 1.8em; }
+
+        .main { flex: 1; display: flex; padding: 10px; gap: 10px; min-height: 0; }
+        .side { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+        .task-box { background: #fff; border-radius: 20px; border: 4px solid #333; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 6px 0 #bbb; }
+        .emoji-icon { font-size: 4.5em; margin: 0; }
+        .hint-text { font-size: 1.8em; font-weight: 900; color: var(--blue); display: none; }
+        .btn-hint { background: var(--green); color: white; border: none; padding: 6px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 5px; box-shadow: 0 3px 0 #27ae60; }
+
+        .center-field { width: 280px; position: relative; background: linear-gradient(to bottom, #4facfe, #00f2fe, #56ab2f, #a8e063); border: 4px solid #fff; border-radius: 20px; overflow: hidden; }
+        #tug-container { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform 0.6s ease-out; }
+        .tug-img { width: 260px; }
+
+        .keyboard { background: var(--dark); padding: 10px; border-radius: 15px; border-bottom: 8px solid #263238; }
+        .display { background: #000; color: #fff; padding: 8px; border-radius: 8px; font-size: 1.6em; text-align: center; font-family: 'Share+Tech+Mono', monospace; min-height: 1.2em; margin-bottom: 8px; border: 3px solid #607d8b; }
+        .row { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
+        .key { background: #cfd8dc; border: none; width: 48px; height: 48px; border-radius: 6px; font-size: 1.2em; font-weight: 900; cursor: pointer; border-bottom: 4px solid #90a4ae; display: flex; align-items: center; justify-content: center; }
+        .key:active { transform: translateY(2px); border-bottom: none; }
+        .wide-btn { height: 48px; border-radius: 6px; font-weight: 900; cursor: pointer; border: none; border-bottom: 4px solid; color: white; flex: 1; text-transform: uppercase; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: flex; align-items: center; justify-content: center; color: white; }
+        .card { background: white; color: #333; padding: 35px; border-radius: 30px; border: 10px solid var(--blue); width: 75%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .teacher-row { display: grid; grid-template-columns: 50px 1fr 1fr 80px; gap: 10px; margin-bottom: 8px; padding: 10px; background: #f9f9f9; border-radius: 12px; }
+        .help-box { background: #e3f2fd; padding: 15px; border-radius: 12px; text-align: left; margin-bottom: 20px; border-left: 6px solid var(--blue); }
+        input { padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-weight: bold; }
+        .stat-val { font-size: 1.5em; color: var(--blue); font-weight: 900; }
+        .winner-tag { font-size: 3em; margin: 10px 0; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div id="start-screen" class="overlay">
+    <div class="card">
+        <h1 style="color:var(--blue)">ПРАВОПИСНА БИТКА</h1>
+        <div style="font-size: 1.3em; margin: 15px 0; font-weight: 900; color: #666;">Автор: Дочка Кючукова</div>
+        <div class="help-box" style="text-align: center; font-size: 1.1em; line-height: 1.6;">
+            Двата отбора се състезават с <strong>ЕДНАКВИ ДУМИ</strong>, но в <strong>РАЗЛИЧЕН РЕД</strong>.<br>
+            ⭐ Всяка правилно написана дума носи <strong>10 точки</strong>.<br>
+            💡 При необходимост използвай жокер, но той ще ти отнеме <strong>2 точки</strong>.<br>
+            Кой ще бъде най-бързият майстор на думите?
+        </div>
+        <div style="display:flex; gap:15px; justify-content: center;">
+            <button class="btn-hint" style="font-size: 1.6em; padding: 15px 50px;" onclick="startGame()">🚀 СТАРТ</button>
+            <button class="btn-hint" style="background:var(--dark); font-size: 1.6em; padding: 15px 50px; box-shadow: 0 3px 0 #263238;" onclick="toggleTeacher(true)">⚙️ ПАНЕЛ</button>
+        </div>
+    </div>
+</div>
+
+<div id="end-screen" class="overlay" style="display:none;">
+    <div class="card" id="end-card">
+        <div style="font-size: 1.5em;">🏆 КРАЕН РЕЗУЛТАТ 🏆</div>
+        <div id="winner-name" class="winner-tag"></div>
+        <div id="motivational-msg" style="font-size: 1.2em; font-style: italic; margin-bottom: 20px;"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 2px solid #eee; padding-top: 20px;">
+            <div>
+                <div style="color:#777">ВРЕМЕ ЗА ИГРА</div>
+                <div id="final-time" class="stat-val">00:00</div>
+            </div>
+            <div>
+                <div style="color:#777">ТОЧКИ</div>
+                <div id="final-points" class="stat-val">0</div>
+            </div>
+        </div>
+        <button class="btn-hint" style="margin-top: 30px; font-size: 1.4em; padding: 10px 40px;" onclick="location.reload()">🔄 НОВА ИГРА</button>
+    </div>
+</div>
+
+<div id="teacher-panel" class="overlay" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--blue)">УЧИТЕЛСКИ ПАНЕЛ</h2>
+        <div id="words-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 10px;"></div>
+        <button class="btn-hint" onclick="addWord()">➕ ДОБАВИ ДУМА</button>
+        <hr>
+        <div style="display:flex; gap:10px; justify-content: center;">
+            <button class="btn-hint" style="background:#8e44ad;" onclick="downloadData()">💾 ЗАПАЗИ</button>
+            <button class="btn-hint" style="background:#e67e22;" onclick="document.getElementById('fileInput').click()">📂 ЗАРЕДИ</button>
+            <button class="btn-hint" style="background:var(--red);" onclick="saveAndClose()">ЗАТВОРИ</button>
+        </div>
+        <input type="file" id="fileInput" style="display:none" onchange="uploadData(event)">
+    </div>
+</div>
+
+<div class="screen">
+    <div class="header"><h1>ПРАВОПИСНА БИТКА</h1><div id="timer-box">00:00</div></div>
+    <div class="main">
+        <div class="side">
+            <div style="background:var(--blue); color:white; padding:10px; border-radius:12px; text-align:center; font-weight:900;">СИНИ • ТОЧКИ: <span id="p1">0</span></div>
+            <div class="task-box">
+                <div id="emo1" class="emoji-icon">🍎</div>
+                <div id="txt1" class="hint-text"></div>
+                <button class="btn-hint" onclick="useHint(1)">💡 ЖОКЕР (-2т)</button>
+            </div>
+            <div class="keyboard">
+                <div class="display" id="d1"></div>
+                <div id="kb1"></div>
+            </div>
+        </div>
+
+        <div class="center-field">
+            <div id="tug-container"><img src="1.png" class="tug-img"></div>
+        </div>
+
+        <div class="side">
+            <div style="background:var(--red); color:white; padding:10px; border-radius:12px; text-align:center; font-weight:900;">ЧЕРВЕНИ • ТОЧКИ: <span id="p2">0</span></div>
+            <div class="task-box">
+                <div id="emo2" class="emoji-icon">🍎</div>
+                <div id="txt2" class="hint-text"></div>
+                <button class="btn-hint" onclick="useHint(2)">💡 ЖОКЕР (-2т)</button>
+            </div>
+            <div class="keyboard">
+                <div class="display" id="d2"></div>
+                <div id="kb2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+   const bdsRows = [
+        [ "У", "Е", "И", "Ш", "Щ", "К", "С", "Д", "З", "Ц"],
+        ["Ь", "Я", "А", "О", "Ж", "Г", "Т", "Н", "В", "М", "Ч"],
+        ["Ю", "Й","Ъ","Ф","Х","П", "Р","Л", "Б"]
+    ];
+
+
+    let masterWords = [
+        {w:"ЯБЪЛКА", e:"🍎"}, {w:"КУЧЕ", e:"🐶"}, {w:"СЛЪНЦЕ", e:"☀️"}, {w:"КОЛА", e:"🚗"},
+        {w:"КЪЩА", e:"🏠"}, {w:"РОЗА", e:"🌹"}, {w:"МОРЕ", e:"🌊"}, {w:"ДЪРВО", e:"🌳"}
+    ];
+
+    let t1Words = [], t2Words = [];
+    let game = { i1:0, i2:0, s1:0, s2:0, in1:"", in2:"", off:0, sec:0, active:false };
+
+    function toggleTeacher(show) { document.getElementById('teacher-panel').style.display = show ? 'flex' : 'none'; if(show) renderTeacherList(); }
+    function renderTeacherList() {
+        const list = document.getElementById('words-list');
+        list.innerHTML = masterWords.map((item, i) => `
+            <div class="teacher-row">
+                <span>${i+1}</span>
+                <input type="text" value="${item.w}" onchange="masterWords[${i}].w=this.value.toUpperCase()">
+                <input type="text" value="${item.e}" onchange="masterWords[${i}].e=this.value">
+                <button onclick="masterWords.splice(${i},1);renderTeacherList()" style="color:red;border:none;cursor:pointer">❌</button>
+            </div>
+        `).join('');
+    }
+    function addWord() { masterWords.push({w:"", e:""}); renderTeacherList(); }
+    function downloadData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(masterWords));
+        const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "bitka.json"); dl.click();
+    }
+    function uploadData(ev) {
+        const reader = new FileReader();
+        reader.onload = (e) => { masterWords = JSON.parse(e.target.result); renderTeacherList(); };
+        reader.readAsText(ev.target.files[0]);
+    }
+    function saveAndClose() { toggleTeacher(false); }
+
+    function startGame() {
+        t1Words = [...masterWords].sort(() => Math.random() - 0.5);
+        t2Words = [...masterWords].sort(() => Math.random() - 0.5);
+        document.getElementById('start-screen').style.display = 'none';
+        game.active = true;
+        updateDisplay();
+        setInterval(() => {
+            if(!game.active) return;
+            game.sec++;
+            let m = Math.floor(game.sec/60).toString().padStart(2,'0');
+            let s = (game.sec%60).toString().padStart(2,'0');
+            document.getElementById('timer-box').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    function init() {
+        [1, 2].forEach(p => {
+            const kb = document.getElementById('kb'+p);
+            bdsRows.forEach(row => {
+                const rowDiv = document.createElement('div'); rowDiv.className = 'row';
+                row.forEach(k => {
+                    const b = document.createElement('button'); b.className = 'key'; b.innerText = k;
+                    b.onclick = () => { if(game.active) { game['in'+p] += k; renderText(); }};
+                    rowDiv.appendChild(b);
+                });
+                kb.appendChild(rowDiv);
+            });
+            const ctrl = document.createElement('div'); ctrl.className = 'row';
+            ctrl.innerHTML = `<button class="wide-btn" style="background:var(--red); margin-right:5px" onclick="game.in${p}='';renderText()">ИЗТРИЙ</button>
+                             <button class="wide-btn" style="background:var(--gold); color:000" onclick="check(${p})">ПРОВЕРИ</button>`;
+            kb.appendChild(ctrl);
+        });
+    }
+
+    function useHint(p) {
+        if(!game.active) return;
+        game['s'+p] = Math.max(0, game['s'+p] - 2); // Наказание -2 точки
+        updateDisplay();
+        const list = p === 1 ? t1Words : t2Words;
+        document.getElementById('emo'+p).style.display = 'none';
+        document.getElementById('txt'+p).innerText = list[game['i'+p]].w;
+        document.getElementById('txt'+p).style.display = 'block';
+        setTimeout(() => { document.getElementById('emo'+p).style.display = 'block'; document.getElementById('txt'+p).style.display = 'none'; }, 1200);
+    }
+
+    function check(p) {
+        const list = p === 1 ? t1Words : t2Words;
+        if(game['in'+p] === list[game['i'+p]].w) {
+            game['s'+p] += 10; // Награда +10 точки
+            game.off += (p === 1 ? -45 : 45);
+            game['i'+p]++; game['in'+p] = "";
+            if(game['i'+p] >= list.length) endGame(p);
+            updateDisplay(); renderText();
+        } else {
+            game['in'+p] = ""; renderText();
+        }
+    }
+
+    function endGame(p) {
+        game.active = false;
+        const winName = p === 1 ? "СИНИТЕ" : "ЧЕРВЕНИТЕ";
+        const color = p === 1 ? 'var(--blue)' : 'var(--red)';
+        const card = document.getElementById('end-card');
+        document.getElementById('winner-name').innerText = winName;
+        document.getElementById('winner-name').style.color = color;
+        card.style.borderColor = color;
+        document.getElementById('final-time').innerText = document.getElementById('timer-box').innerText;
+        document.getElementById('final-points').innerText = game['s'+p];
+        const msgs = ["Страхотен правопис!", "Вие сте шампиони по грамотност!", "Брилянтна победа!", "Отлична работа!"];
+        document.getElementById('motivational-msg').innerText = msgs[Math.floor(Math.random()*msgs.length)];
+        document.getElementById('end-screen').style.display = 'flex';
+    }
+
+    function renderText() {
+        document.getElementById('d1').innerText = game.in1;
+        document.getElementById('d2').innerText = game.in2;
+    }
+
+    function updateDisplay() {
+        [1, 2].forEach(p => {
+            const list = p === 1 ? t1Words : t2Words;
+            if(game['i'+p] < list.length) document.getElementById('emo'+p).innerText = list[game['i'+p]].e;
+            document.getElementById('p'+p).innerText = game['s'+p];
+        });
+        document.getElementById('tug-container').style.transform = `translateX(${game.off}px)`;
+    }
+
+    init();
+</script>
+</body>
+</html>
